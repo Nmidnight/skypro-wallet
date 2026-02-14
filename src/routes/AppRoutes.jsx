@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
-import { Layout } from '../layout/layout';
+// подредактировал испорт файл и папка с большой буквы '../layout/layout' 
+import { Layout } from '../Layout/Layout';
 import { MainPage } from '../pages/MainPage';
 import { SigninPage } from '../pages/SigninPage';
 import { SignupPage } from '../pages/SignupPage';
