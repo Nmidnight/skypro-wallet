@@ -1,0 +1,129 @@
+/* Глобальные переменные цвета */
+:root {
+    --bg-color: #F4F5F6;      /* Светло-серый фон страницы*/
+    --card-bg: #FFFFFF;       /* Белый фон карточки */
+    --primary-color: #7334EA; /* Фиолетовый — основной цвет кнопок */
+    --text-default: #999999;  /* Серый — плейсхолдеры и границы по умолчанию */
+    --text-active: #000000;   /* Черный — цвет текста при вводе данных */
+    --shadow: 0px 20px 67px -12px rgba(0, 0, 0, 0.13); /* Тень карточки */
+}
+
+/* Базовые настройки страницы */
+body {
+    margin: 0;
+    background-color: var(--bg-color);
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Контейнер формы */
+.auth-card {
+    width: 379px;
+    min-height: 385px;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    border-radius: 30px;
+    padding: 32px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Заголовок "Регистрация" или "Вход" */
+.auth-title {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 29px;
+    margin-bottom: 24px;
+    color: var(--text-active);
+    text-align: center;
+}
+
+/* Сетка формы */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Общие стили инпутов */
+input {
+    width: 100%;
+    height: 39px;
+    border: 0.5px solid var(--text-default);
+    border-radius: 6px;
+    padding: 12px;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+    color: var(--text-default);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+/* Состояние инпута с текстом через JS */
+input.filled {
+    color: var(--text-active);
+    border-color: var(--text-active);
+}
+
+/* Главная кнопка действия */
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    height: 39px;
+    width: 100%;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.3s ease;
+}
+
+/* Состояние заблокированной кнопки если поля не заполнены */
+.btn-primary:disabled {
+    background: #D1D1D1; /* Неактивная кнопка */
+    cursor: not-allowed;
+}
+
+/* Текст внизу "Уже есть аккаунт?" */
+.auth-footer {
+    margin-top: 24px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--text-default);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Переход между экранами */
+.auth-link {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-default);
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+}
+
+/* Имитация Line 58 из Figma при наведении или просто как декорация */
+.auth-link:after {
+    content: "";
+    display: block;
+    width: 100%; /* Теперь линия ВСЕГДА равна ширине текста */
+    height: 1px;
+    background: var(--text-default);
+    margin-top: 1px;
+    transition: background 0.2s ease;
+}

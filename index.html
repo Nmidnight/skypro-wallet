@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skypro.Wallet - Вход</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="auth-container">
+        <div class="auth-card">
+            <h1 class="auth-title">Вход</h1>
+            
+            <form id="login-form" class="auth-form">
+                <div class="input-group">
+                    <input type="email" id="user-email" placeholder="Эл. почта" required>
+                </div>
+                
+                <div class="input-group">
+                    <input type="password" id="user-password" placeholder="Пароль" required>
+                </div>
+
+                <button type="submit" id="login-button" class="btn-primary" disabled>
+                    Войти
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <span>Еще нет аккаунта?</span>
+                <a href="registration.html" class="auth-link">Зарегистрироваться здесь</a>
+            </div>
+        </div>
+    </main>
+    <script src="js/main.js"></script>
+</body>
+</html>
