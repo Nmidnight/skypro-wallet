@@ -1,5 +1,10 @@
+import { Header } from "../components/Header/Header";
+
 export function SigninPage() {
-    return (
-        <p> SigninPage page is not ready yet</p>
-    );
+  return (
+    <>
+      <Header />
+      <p> SigninPage page is not ready yet</p>
+    </>
+  );
 }
