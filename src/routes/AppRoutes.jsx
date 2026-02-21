@@ -12,13 +12,14 @@ export function AppRoutes() {
         <Routes>
             <Route path="/signin" element={<SigninPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="*" element={<NotFoundPage />} />
 
             {/* @TODO: вот тут начинаются приватные маршруты */}
             <Route path="/" element={<Layout />}>
                 <Route index element={<MainPage />} />
                 <Route path="analysis" element={<AnalysisPage />} />
             </Route>
+
+            <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );
 }
