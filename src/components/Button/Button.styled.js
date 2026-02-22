@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { gray, buttonMainColor } from "../../styles/colors"
+import { gray, buttonMainColor } from "../../styles/colors";
 
 export const ButtonDefault = styled.button`
   height: 39px;
@@ -10,5 +10,4 @@ export const ButtonDefault = styled.button`
   font-size: 12px;
 
   background-color: ${({ $disabled }) => ($disabled ? gray : buttonMainColor)};
-
-`
+`;
