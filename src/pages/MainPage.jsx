@@ -1,5 +1,11 @@
+import { MainPageForm } from "../components/MainPageForm/MainPageForm";
+
 // Тут будут "Мои расходы"
 
 export function MainPage() {
-  return <p> MainPage not created yet</p>;
+  return (
+    <div style={{ backgroundColor: "#F4F5F6", padding: "30px" }}>
+      <MainPageForm></MainPageForm>
+    </div>
+  );
 }
