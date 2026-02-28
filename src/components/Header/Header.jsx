@@ -15,15 +15,22 @@ import {
 import logo from "../../assets/header-logo.svg";
 import arrow from "../../assets/header-arrow.svg";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext/useAuth";
+
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  const { authLogout } = useAuth();
+
   const handleLogout = () => {
-    console.log("logout");
+    authLogout();
   };
+
+
   const location = useLocation();
   const onlyLogoPath = ["/signin", "/signup"];
   const showOnlyLogo = onlyLogoPath.includes(location.pathname);

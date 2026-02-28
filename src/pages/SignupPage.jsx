@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ButtonDefault } from "../components/Button/Button.styled";
 import { Input } from "../components/Input/Input";
+import { signupUser } from '../services/AuthApi';
+import { Link, useNavigate } from 'react-router-dom';
 
 const PageWrapper = styled("div")({
   display: 'flex',
@@ -56,9 +58,13 @@ const FooterText = styled("p")({
 });
 
 export function SignupPage() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+
 
   const isNameValid = name.length > 2;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -68,12 +74,28 @@ export function SignupPage() {
   const emailError = email.length > 0 && !isEmailValid;
   const passwordError = password.length > 0 && !isPasswordValid;
 
-  const isButtonDisabled = nameError || emailError || passwordError;
+  const isFormValid = isNameValid && isEmailValid && isPasswordValid;
 
-  const handleSubmit = (e) => {
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!isButtonDisabled && isNameValid && isEmailValid && isPasswordValid) {
-      console.log("Регистрация:", { name, email, password });
+
+    if (!isFormValid) return;
+
+    const user = {
+      login: email,
+      name,
+      password,
+    };
+
+    console.log(user);
+    try {
+      {
+        await signupUser(user);
+        navigate("/signin");
+      }
+    } catch (err) {
+      console.error(err?.response?.data?.message || "Ошибка регистрации");
     }
   };
 
@@ -81,10 +103,10 @@ export function SignupPage() {
     <PageWrapper>
       <FormContainer onSubmit={handleSubmit}>
         <Title>Регистрация</Title>
-        
-        <Input 
-          type="text" 
-          placeholder="Ева Иванова" 
+
+        <Input
+          type="text"
+          placeholder="Ева Иванова"
           value={name}
           onChange={(e) => setName(e.target.value)}
           isSuccess={isNameValid}
@@ -92,9 +114,9 @@ export function SignupPage() {
           errorMsg="Имя слишком короткое"
         />
 
-        <Input 
-          type="email" 
-          placeholder="ivanovaeva@mail.ru" 
+        <Input
+          type="email"
+          placeholder="ivanovaeva@mail.ru"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           isSuccess={isEmailValid}
@@ -102,9 +124,9 @@ export function SignupPage() {
           errorMsg="Введите корректный email"
         />
 
-        <Input 
-          type="password" 
-          placeholder="********" 
+        <Input
+          type="password"
+          placeholder="********"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           isSuccess={isPasswordValid}
@@ -112,17 +134,17 @@ export function SignupPage() {
           errorMsg="Упс! Введенные данные некорректны."
         />
 
-        <ButtonDefault 
-          type="submit" 
+        <ButtonDefault
+          type="submit"
           style={{ marginTop: '20px' }}
-          disabled={isButtonDisabled}   /* Отключает клик */
-          $disabled={isButtonDisabled}  /* МЕНЯЕТ ЦВЕТ НА СЕРЫЙ */
+          disabled={!isFormValid}   /* Отключает клик */
+          $disabled={!isFormValid}  /* МЕНЯЕТ ЦВЕТ НА СЕРЫЙ */
         >
           Зарегистрироваться
         </ButtonDefault>
 
         <FooterText>
-          Уже есть аккаунт? <a href="/signin">Войдите здесь</a>
+          Уже есть аккаунт? <Link to="/signin">Войдите здесь</Link>
         </FooterText>
       </FormContainer>
     </PageWrapper>
