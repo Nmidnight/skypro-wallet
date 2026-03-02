@@ -44,4 +44,4 @@ npm run format
 
 В main напрямую не пушим.
 
-Все изменения — через Pull Request.
+Все изменения — через Pull Request..
