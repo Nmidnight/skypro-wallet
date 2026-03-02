@@ -1,15 +1,15 @@
 import { GlobalStyles } from "./styles/GlobalStyles"; 
 import { AppRoutes } from "./routes/AppRoutes";
-// 1. Импортируем контейнер и базовые стили библиотеки
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { AuthProvider } from "./context/AuthContext/AuthProvider";
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <GlobalStyles />
       <AppRoutes />
-      {/* 2. Добавляем контейнер в конец, чтобы уведомления всплывали поверх всего */}
+      {/* Оставляем только один контейнер в самом конце */}
       <ToastContainer 
         position="top-right"
         autoClose={5000}
@@ -22,8 +22,8 @@ function App() {
         pauseOnHover
         theme="light"
       />
-    </>
-  )
+    </AuthProvider>
+  );
 }
 
 export default App;

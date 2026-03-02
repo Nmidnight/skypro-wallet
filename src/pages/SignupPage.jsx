@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ButtonDefault } from "../components/Button/Button.styled";
 import { Input } from "../components/Input/Input";
-
+import { signupUser } from '../services/AuthApi';
+import { Link, useNavigate } from 'react-router-dom';
+import { notify } from "../utils/notify"; // ДОБАВИЛИ ИМПОРТ
 
 const PageWrapper = styled("div")({
   display: 'flex',
@@ -66,14 +68,13 @@ const FooterText = styled("p")({
 });
 
 export function SignupPage() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  // Состояние для ошибки от "сервера"
   const [serverError, setServerError] = useState(null);
 
-  // Валидация полей
   const isNameValid = name.length > 2;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPasswordValid = password.length >= 8;
@@ -82,37 +83,42 @@ export function SignupPage() {
   const emailError = email.length > 0 && !isEmailValid;
   const passwordError = password.length > 0 && !isPasswordValid;
 
-  // Кнопка заблокирована, если есть ошибки или поля пустые
-  const isButtonDisabled = nameError || emailError || passwordError || !name || !email || !password;
+  const isFormValid = isNameValid && isEmailValid && isPasswordValid;
 
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    setServerError(null); // Сбрасываем старую ошибку перед проверкой
+    setServerError(null);
 
-    if (!isButtonDisabled) {
-      console.log("Отправка данных на регистрацию:", { name, email, password });
-
-      // Имитация базы данных существующих пользователей для проверки правки
-      const existingEmails = ['admin@mail.ru', 'ivanovaeva@mail.ru'];
-      
-      if (existingEmails.includes(email.toLowerCase())) {
-        // ПРАВКА: Вывод сообщения, если пользователь уже есть
-        setServerError("Пользователь с таким именем или Эл.почтой уже зарегистрирован");
-      } else {
-        alert("Регистрация прошла успешно!");
-        // Здесь в будущем будет переход: navigate('/signin');
-      }
+    if (!isFormValid) {
+        notify.warn("Пожалуйста, заполните все поля корректно");
+        return;
     }
-  };
+
+    const user = {
+      login: email,
+      name,
+      password,
+    };
+
+    try {
+        await signupUser(user);
+        notify.success("Регистрация прошла успешно!");
+        navigate("/signin");
+    } catch (err) {
+        const errorMsg = err?.response?.data?.message || "Ошибка регистрации";
+        setServerError(errorMsg);
+        notify.error(errorMsg);
+    }
+  }
 
   return (
     <PageWrapper>
       <FormContainer onSubmit={handleSubmit}>
         <Title>Регистрация</Title>
-        
-        <Input 
-          type="text" 
-          placeholder="Ева Иванова" 
+
+        <Input
+          type="text"
+          placeholder="Ева Иванова"
           value={name}
           onChange={(e) => {
             setName(e.target.value);
@@ -123,9 +129,9 @@ export function SignupPage() {
           errorMsg="Имя слишком короткое"
         />
 
-        <Input 
-          type="email" 
-          placeholder="ivanovaeva@mail.ru" 
+        <Input
+          type="email"
+          placeholder="ivanovaeva@mail.ru"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -136,9 +142,9 @@ export function SignupPage() {
           errorMsg="Введите корректный email"
         />
 
-        <Input 
-          type="password" 
-          placeholder="********" 
+        <Input
+          type="password"
+          placeholder="********"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
@@ -149,20 +155,19 @@ export function SignupPage() {
           errorMsg="Упс! Введенные данные некорректны."
         />
 
-        {/* Вывод серверной ошибки над кнопкой */}
         {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
 
-        <ButtonDefault 
-          type="submit" 
-          style={{ marginTop: '10px' }}
-          disabled={isButtonDisabled}
-          $disabled={isButtonDisabled}
+        <ButtonDefault
+          type="submit"
+          style={{ marginTop: '20px' }}
+          disabled={!isFormValid}
+          $disabled={!isFormValid}
         >
           Зарегистрироваться
         </ButtonDefault>
 
         <FooterText>
-          Уже есть аккаунт? <a href="/signin">Войдите здесь</a>
+          Уже есть аккаунт? <Link to="/signin">Войдите здесь</Link>
         </FooterText>
       </FormContainer>
     </PageWrapper>

@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
 export const GlobalStyles = createGlobalStyle`
   *, *::before, *::after { box-sizing: border-box; }
@@ -15,4 +15,5 @@ export const GlobalStyles = createGlobalStyle`
 
   a { color: inherit; text-decoration: none; }
   button, input, textarea { font: inherit; }
+
 `;

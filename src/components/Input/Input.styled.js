@@ -1,5 +1,11 @@
 import styled from "styled-components";
-import { gray, purpleBg, purpleBorder, redBg, redBorder } from "../../styles/colors";
+import {
+  gray,
+  purpleBg,
+  purpleBorder,
+  redBg,
+  redBorder,
+} from "../../styles/colors";
 
 export const InputDefault = styled.input`
   width: 100%;
