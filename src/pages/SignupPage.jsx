@@ -4,6 +4,7 @@ import { ButtonDefault } from "../components/Button/Button.styled";
 import { Input } from "../components/Input/Input";
 import { signupUser } from '../services/AuthApi';
 import { Link, useNavigate } from 'react-router-dom';
+import { notify } from "../utils/notify"; // ДОБАВИЛИ ИМПОРТ
 
 const PageWrapper = styled("div")({
   display: 'flex',
@@ -32,6 +33,15 @@ const Title = styled("h1")({
   marginBottom: '20px',
   fontFamily: "'Montserrat', sans-serif",
   color: '#000'
+});
+
+const ErrorMessage = styled("p")({
+  color: "#FF4D4D",
+  fontSize: "12px",
+  fontFamily: "'Montserrat', sans-serif",
+  margin: "0 0 10px 0",
+  textAlign: "center",
+  lineHeight: "140%"
 });
 
 const FooterText = styled("p")({
@@ -63,8 +73,7 @@ export function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-
+  const [serverError, setServerError] = useState(null);
 
   const isNameValid = name.length > 2;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -76,11 +85,14 @@ export function SignupPage() {
 
   const isFormValid = isNameValid && isEmailValid && isPasswordValid;
 
-
   async function handleSubmit(e) {
     e.preventDefault();
+    setServerError(null);
 
-    if (!isFormValid) return;
+    if (!isFormValid) {
+        notify.warn("Пожалуйста, заполните все поля корректно");
+        return;
+    }
 
     const user = {
       login: email,
@@ -88,16 +100,16 @@ export function SignupPage() {
       password,
     };
 
-    console.log(user);
     try {
-      {
         await signupUser(user);
+        notify.success("Регистрация прошла успешно!");
         navigate("/signin");
-      }
     } catch (err) {
-      console.error(err?.response?.data?.message || "Ошибка регистрации");
+        const errorMsg = err?.response?.data?.message || "Ошибка регистрации";
+        setServerError(errorMsg);
+        notify.error(errorMsg);
     }
-  };
+  }
 
   return (
     <PageWrapper>
@@ -108,7 +120,10 @@ export function SignupPage() {
           type="text"
           placeholder="Ева Иванова"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (serverError) setServerError(null);
+          }}
           isSuccess={isNameValid}
           isError={nameError}
           errorMsg="Имя слишком короткое"
@@ -118,7 +133,10 @@ export function SignupPage() {
           type="email"
           placeholder="ivanovaeva@mail.ru"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (serverError) setServerError(null);
+          }}
           isSuccess={isEmailValid}
           isError={emailError}
           errorMsg="Введите корректный email"
@@ -128,17 +146,22 @@ export function SignupPage() {
           type="password"
           placeholder="********"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (serverError) setServerError(null);
+          }}
           isSuccess={isPasswordValid}
           isError={passwordError}
           errorMsg="Упс! Введенные данные некорректны."
         />
 
+        {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
+
         <ButtonDefault
           type="submit"
           style={{ marginTop: '20px' }}
-          disabled={!isFormValid}   /* Отключает клик */
-          $disabled={!isFormValid}  /* МЕНЯЕТ ЦВЕТ НА СЕРЫЙ */
+          disabled={!isFormValid}
+          $disabled={!isFormValid}
         >
           Зарегистрироваться
         </ButtonDefault>

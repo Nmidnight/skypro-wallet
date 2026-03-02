@@ -1,17 +1,27 @@
-import { GlobalStyles } from "./styles/GlobalStyles";
+import { GlobalStyles } from "./styles/GlobalStyles"; 
 import { AppRoutes } from "./routes/AppRoutes";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from "./context/AuthContext/AuthProvider";
+
 function App() {
   return (
     <AuthProvider>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-      />
       <GlobalStyles />
       <AppRoutes />
+      {/* Оставляем только один контейнер в самом конце */}
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </AuthProvider>
   );
 }
