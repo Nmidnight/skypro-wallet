@@ -1,11 +1,11 @@
-import { MainPageForm } from "../components/MainPageForm/MainPageForm";
-
-// Тут будут "Мои расходы"
+import React from 'react';
+import { ExpensesTable } from '../components/ExpensesTable/ExpensesTable';
 
 export function MainPage() {
   return (
-    <div style={{ backgroundColor: "#F4F5F6", padding: "30px" }}>
-      <MainPageForm></MainPageForm>
-    </div>
+    <main style={{ position: 'relative', width: '100%', minHeight: '100vh' }}>
+      <ExpensesTable />
+      {/* НОВЫЙ РАСХОД БУДЕТ ЗДЕСЬ" */}
+    </main>
   );
 }
