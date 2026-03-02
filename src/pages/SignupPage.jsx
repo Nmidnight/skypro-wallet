@@ -90,8 +90,8 @@ export function SignupPage() {
     setServerError(null);
 
     if (!isFormValid) {
-        notify.warn("Пожалуйста, заполните все поля корректно");
-        return;
+      notify.warn("Пожалуйста, заполните все поля корректно");
+      return;
     }
 
     const user = {
@@ -101,21 +101,21 @@ export function SignupPage() {
     };
 
     try {
-        await signupUser(user);
-        notify.success("Регистрация прошла успешно!");
-        navigate("/signin");
+      await signupUser(user);
+      notify.success("Регистрация прошла успешно!");
+      navigate("/signin");
     } catch (err) {
-        // Выводим в консоль, чтобы точно видеть, что прислал бэкенд
-        console.error("Данные ошибки от сервера:", err.response?.data);
+      // Выводим в консоль, чтобы точно видеть, что прислал бэкенд
+      console.error("Данные ошибки от сервера:", err.response?.data);
 
-        // Проверяем оба варианта ключей: 'message' или 'error'
-        const errorMsg = 
-            err?.response?.data?.message || 
-            err?.response?.data?.error || 
-            "Ошибка регистрации. Попробуйте позже.";
+      // Проверяем оба варианта ключей: 'message' или 'error'
+      const errorMsg = 
+        err?.response?.data?.message || 
+        err?.response?.data?.error || 
+        "Ошибка регистрации. Попробуйте позже.";
 
-        setServerError(errorMsg);
-        notify.error(errorMsg);
+      setServerError(errorMsg);
+      notify.error(errorMsg);
     }
   }
 
