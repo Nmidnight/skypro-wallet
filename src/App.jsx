@@ -1,14 +1,20 @@
 // Добавил импорт глобальных стилей
-import { GlobalStyles } from "./styles/GlobalStyles"; 
-import { AppRoutes } from "./routes/AppRoutes";
 import { GlobalStyles } from "./styles/GlobalStyles";
+import { AppRoutes } from "./routes/AppRoutes";
+import { AuthProvider } from "./context/AuthContext/AuthProvider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
-    <>
+    <AuthProvider>
+      <ToastContainer
+          position="top-right"
+          autoClose={3000}
+      />
       <GlobalStyles />
       <AppRoutes />
-    </>
+    </AuthProvider>
   );
 }
 

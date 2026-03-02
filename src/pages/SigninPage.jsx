@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ButtonDefault } from "../components/Button/Button.styled";
 import { Input } from "../components/Input/Input";
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext/useAuth';
+import { signinUser } from '../services/AuthApi';
 
 const PageWrapper = styled("div")({
   display: 'flex',
@@ -59,6 +62,8 @@ export function SigninPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const navigate = useNavigate();
+
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPasswordValid = password.length >= 8;
 
@@ -67,14 +72,31 @@ export function SigninPage() {
   const passwordError = password.length > 0 && !isPasswordValid;
   const isButtonDisabled = emailError || passwordError;
 
+  const { authLogin } = useAuth();
+
+  async function handleSignIn(e) {
+    e.preventDefault();
+
+    try {
+
+      const data = await signinUser({ login: email, password });
+      authLogin(data)
+      navigate("/");
+
+
+    }
+    catch (err) {
+      console.error(err.response.data.error);
+    }
+  }
   return (
     <PageWrapper>
-      <FormContainer onSubmit={(e) => e.preventDefault()}>
+      <FormContainer onSubmit={(e) => handleSignIn(e)}>
         <Title>Вход</Title>
-        
-        <Input 
-          type="email" 
-          placeholder="ivanovaeva@mail.ru" 
+
+        <Input
+          type="email"
+          placeholder="ivanovaeva@mail.ru"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           isSuccess={isEmailValid}
@@ -82,9 +104,9 @@ export function SigninPage() {
           errorMsg="Введите корректный email"
         />
 
-        <Input 
-          type="password" 
-          placeholder="********" 
+        <Input
+          type="password"
+          placeholder="********"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           isSuccess={isPasswordValid}
@@ -92,8 +114,8 @@ export function SigninPage() {
           errorMsg="Упс! Введенные вами данные некорректны. Введите данные корректно и повторите попытку."
         />
 
-        <ButtonDefault 
-          type="submit" 
+        <ButtonDefault
+          type="submit"
           style={{ marginTop: '20px' }}
           disabled={isButtonDisabled}  // Блокирует клик
           $disabled={isButtonDisabled} // МЕНЯЕТ ЦВЕТ НА СЕРЫЙ
@@ -102,8 +124,8 @@ export function SigninPage() {
         </ButtonDefault>
 
         <FooterText>
-          Нужно зарегистрироваться? 
-          <a href="/signup">Регистрируйтесь здесь</a>
+          Нужно зарегистрироваться?
+          <Link to="/signup">Регистрируйтесь здесь</Link>
         </FooterText>
       </FormContainer>
     </PageWrapper>
