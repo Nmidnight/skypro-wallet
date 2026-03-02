@@ -90,8 +90,8 @@ export function SignupPage() {
     setServerError(null);
 
     if (!isFormValid) {
-        notify.warn("Пожалуйста, заполните все поля корректно");
-        return;
+      notify.warn("Пожалуйста, заполните все поля корректно");
+      return;
     }
 
     const user = {
@@ -101,13 +101,14 @@ export function SignupPage() {
     };
 
     try {
-        await signupUser(user);
-        notify.success("Регистрация прошла успешно!");
-        navigate("/signin");
+      await signupUser(user);
+      notify.success("Регистрация прошла успешно!");
+      navigate("/signin");
     } catch (err) {
-        const errorMsg = err?.response?.data?.message || "Ошибка регистрации";
-        setServerError(errorMsg);
-        notify.error(errorMsg);
+      const errorMsg = err?.response?.data?.error || "Ошибка регистрации";
+      console.log(err?.response?.data?.error);
+      setServerError(errorMsg);
+      notify.error(errorMsg);
     }
   }
 

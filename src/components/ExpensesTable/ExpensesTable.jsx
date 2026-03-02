@@ -1,5 +1,6 @@
 import React from 'react';
 import * as S from './ExpensesTable.styled';
+import { MainPageForm } from '../MainPageForm/MainPageForm';
 
 const mockExpenses = [
   { id: 1, name: 'Пятерочка', category: 'Еда', date: '03.07.2024', amount: '3 500 ₽' },
@@ -26,10 +27,10 @@ export const ExpensesTable = () => {
     <S.PageContainer>
       <S.GlobalBackground />
       <S.PageTitle>Мои расходы</S.PageTitle>
-      
+
       <S.ExpensesCard>
         <S.ExpensesCard__Title>Таблица расходов</S.ExpensesCard__Title>
-        
+
         <S.ExpensesCard__Header>
           <S.ExpensesCard__Th>Описание</S.ExpensesCard__Th>
           <S.ExpensesCard__Th>Категория</S.ExpensesCard__Th>
@@ -37,7 +38,7 @@ export const ExpensesTable = () => {
           <S.ExpensesCard__Th>Сумма</S.ExpensesCard__Th>
           <div></div> {/* Пустая ячейка над иконками */}
         </S.ExpensesCard__Header>
-        
+
         <S.ExpensesList>
           {mockExpenses.map((item) => (
             <S.ExpenseRow key={item.id}>
@@ -53,10 +54,7 @@ export const ExpensesTable = () => {
         </S.ExpensesList>
       </S.ExpensesCard>
 
-      {/* Правая карточка НОВЫЙ РАСХОД */}
-      {/* <S.AddExpenseCard>
-        <S.ExpensesCard__Title>Новый расход</S.ExpensesCard__Title>
-      </S.AddExpenseCard> */}
+      <MainPageForm />
 
     </S.PageContainer>
   );
