@@ -4,7 +4,7 @@ import { ButtonDefault } from "../components/Button/Button.styled";
 import { Input } from "../components/Input/Input";
 import { signupUser } from '../services/AuthApi';
 import { Link, useNavigate } from 'react-router-dom';
-import { notify } from "../utils/notify"; // ДОБАВИЛИ ИМПОРТ
+import { notify } from "../utils/notify";
 
 const PageWrapper = styled("div")({
   display: 'flex',
@@ -105,8 +105,15 @@ export function SignupPage() {
       notify.success("Регистрация прошла успешно!");
       navigate("/signin");
     } catch (err) {
-      const errorMsg = err?.response?.data?.error || "Ошибка регистрации";
-      console.log(err?.response?.data?.error);
+      // Выводим в консоль, чтобы точно видеть, что прислал бэкенд
+      console.error("Данные ошибки от сервера:", err.response?.data);
+
+      // Проверяем оба варианта ключей: 'message' или 'error'
+      const errorMsg = 
+        err?.response?.data?.message || 
+        err?.response?.data?.error || 
+        "Ошибка регистрации. Попробуйте позже.";
+
       setServerError(errorMsg);
       notify.error(errorMsg);
     }
