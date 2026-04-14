@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ButtonDefault } from "../components/Button/Button.styled";
 import { Input } from "../components/Input/Input";
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext/useAuth';
+import { signinUser } from '../services/AuthApi';
+import { notify } from "../utils/notify"; // ДОБАВИЛИ ИМПОРТ
 
 const PageWrapper = styled("div")({
   display: 'flex',
@@ -32,6 +36,16 @@ const Title = styled("h1")({
   color: '#000'
 });
 
+// Добавили компонент для серверной ошибки
+const ErrorMessage = styled("p")({
+  color: "#FF4D4D",
+  fontSize: "12px",
+  fontFamily: "'Montserrat', sans-serif",
+  margin: "0 0 10px 0",
+  textAlign: "center",
+  lineHeight: "140%"
+});
+
 const FooterText = styled("p")({
   fontFamily: "'Montserrat', sans-serif",
   fontSize: '12px',
@@ -58,6 +72,9 @@ const FooterText = styled("p")({
 export function SigninPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [serverError, setServerError] = useState(null); // Состояние для ошибки бэкенда
+
+  const navigate = useNavigate();
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPasswordValid = password.length >= 8;
@@ -65,35 +82,65 @@ export function SigninPage() {
   // Кнопка блокируется, если есть ошибка (ввели неверно)
   const emailError = email.length > 0 && !isEmailValid;
   const passwordError = password.length > 0 && !isPasswordValid;
-  const isButtonDisabled = emailError || passwordError;
+  const isButtonDisabled = emailError || passwordError || !email || !password;
+
+  const { authLogin } = useAuth();
+
+  async function handleSignIn(e) {
+    e.preventDefault();
+    setServerError(null); // Сбрасываем старую ошибку
+
+    try {
+      const data = await signinUser({ login: email, password });
+      authLogin(data);
+      notify.success("Вход выполнен!");
+      navigate("/");
+    }
+    catch (err) {
+      // Подхватываем текст ошибки от сервера
+      const errorMsg = err.response?.data?.message || err.response?.data?.error || "Неверный логин или пароль";
+      setServerError(errorMsg);
+      notify.error(errorMsg);
+      console.error(errorMsg);
+    }
+  }
 
   return (
     <PageWrapper>
-      <FormContainer onSubmit={(e) => e.preventDefault()}>
+      <FormContainer onSubmit={(e) => handleSignIn(e)}>
         <Title>Вход</Title>
-        
-        <Input 
-          type="email" 
-          placeholder="ivanovaeva@mail.ru" 
+
+        <Input
+          type="email"
+          placeholder="ivanovaeva@mail.ru"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (serverError) setServerError(null); // Убираем ошибку при вводе
+          }}
           isSuccess={isEmailValid}
           isError={emailError}
           errorMsg="Введите корректный email"
         />
 
-        <Input 
-          type="password" 
-          placeholder="********" 
+        <Input
+          type="password"
+          placeholder="********"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (serverError) setServerError(null); // Убираем ошибку при вводе
+          }}
           isSuccess={isPasswordValid}
           isError={passwordError}
           errorMsg="Упс! Введенные вами данные некорректны. Введите данные корректно и повторите попытку."
         />
 
-        <ButtonDefault 
-          type="submit" 
+        {/* Вывод серверной ошибки над кнопкой */}
+        {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
+
+        <ButtonDefault
+          type="submit"
           style={{ marginTop: '20px' }}
           disabled={isButtonDisabled}  // Блокирует клик
           $disabled={isButtonDisabled} // МЕНЯЕТ ЦВЕТ НА СЕРЫЙ
@@ -102,8 +149,8 @@ export function SigninPage() {
         </ButtonDefault>
 
         <FooterText>
-          Нужно зарегистрироваться? 
-          <a href="/signup">Регистрируйтесь здесь</a>
+          Нужно зарегистрироваться?
+          <Link to="/signup">Регистрируйтесь здесь</Link>
         </FooterText>
       </FormContainer>
     </PageWrapper>

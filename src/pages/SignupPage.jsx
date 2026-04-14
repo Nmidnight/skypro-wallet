@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ButtonDefault } from "../components/Button/Button.styled";
 import { Input } from "../components/Input/Input";
+import { signupUser } from '../services/AuthApi';
+import { Link, useNavigate } from 'react-router-dom';
+import { notify } from "../utils/notify";
 
 const PageWrapper = styled("div")({
   display: 'flex',
@@ -32,6 +35,15 @@ const Title = styled("h1")({
   color: '#000'
 });
 
+const ErrorMessage = styled("p")({
+  color: "#FF4D4D",
+  fontSize: "12px",
+  fontFamily: "'Montserrat', sans-serif",
+  margin: "0 0 10px 0",
+  textAlign: "center",
+  lineHeight: "140%"
+});
+
 const FooterText = styled("p")({
   fontFamily: "'Montserrat', sans-serif",
   fontSize: '12px',
@@ -56,9 +68,12 @@ const FooterText = styled("p")({
 });
 
 export function SignupPage() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [serverError, setServerError] = useState(null);
 
   const isNameValid = name.length > 2;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -68,61 +83,99 @@ export function SignupPage() {
   const emailError = email.length > 0 && !isEmailValid;
   const passwordError = password.length > 0 && !isPasswordValid;
 
-  const isButtonDisabled = nameError || emailError || passwordError;
+  const isFormValid = isNameValid && isEmailValid && isPasswordValid;
 
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!isButtonDisabled && isNameValid && isEmailValid && isPasswordValid) {
-      console.log("Регистрация:", { name, email, password });
+    setServerError(null);
+
+    if (!isFormValid) {
+      notify.warn("Пожалуйста, заполните все поля корректно");
+      return;
     }
-  };
+
+    const user = {
+      login: email,
+      name,
+      password,
+    };
+
+    try {
+      await signupUser(user);
+      notify.success("Регистрация прошла успешно!");
+      navigate("/signin");
+    } catch (err) {
+      // Выводим в консоль, чтобы точно видеть, что прислал бэкенд
+      console.error("Данные ошибки от сервера:", err.response?.data);
+
+      // Проверяем оба варианта ключей: 'message' или 'error'
+      const errorMsg = 
+        err?.response?.data?.message || 
+        err?.response?.data?.error || 
+        "Ошибка регистрации. Попробуйте позже.";
+
+      setServerError(errorMsg);
+      notify.error(errorMsg);
+    }
+  }
 
   return (
     <PageWrapper>
       <FormContainer onSubmit={handleSubmit}>
         <Title>Регистрация</Title>
-        
-        <Input 
-          type="text" 
-          placeholder="Ева Иванова" 
+
+        <Input
+          type="text"
+          placeholder="Ева Иванова"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (serverError) setServerError(null);
+          }}
           isSuccess={isNameValid}
           isError={nameError}
           errorMsg="Имя слишком короткое"
         />
 
-        <Input 
-          type="email" 
-          placeholder="ivanovaeva@mail.ru" 
+        <Input
+          type="email"
+          placeholder="ivanovaeva@mail.ru"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (serverError) setServerError(null);
+          }}
           isSuccess={isEmailValid}
           isError={emailError}
           errorMsg="Введите корректный email"
         />
 
-        <Input 
-          type="password" 
-          placeholder="********" 
+        <Input
+          type="password"
+          placeholder="********"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (serverError) setServerError(null);
+          }}
           isSuccess={isPasswordValid}
           isError={passwordError}
           errorMsg="Упс! Введенные данные некорректны."
         />
 
-        <ButtonDefault 
-          type="submit" 
+        {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
+
+        <ButtonDefault
+          type="submit"
           style={{ marginTop: '20px' }}
-          disabled={isButtonDisabled}   /* Отключает клик */
-          $disabled={isButtonDisabled}  /* МЕНЯЕТ ЦВЕТ НА СЕРЫЙ */
+          disabled={!isFormValid}
+          $disabled={!isFormValid}
         >
           Зарегистрироваться
         </ButtonDefault>
 
         <FooterText>
-          Уже есть аккаунт? <a href="/signin">Войдите здесь</a>
+          Уже есть аккаунт? <Link to="/signin">Войдите здесь</Link>
         </FooterText>
       </FormContainer>
     </PageWrapper>
