@@ -11,27 +11,30 @@ const AnalysisPageContainer = styled.div`
   gap: 32px;
   background-color: #f4f5f6;
 `;
+
 export const CalendarWrapper = styled.div`
   grid-column: span 4;
 `;
+
 export const AnalysisTitle = styled.h2`
   font-weight: 700;
   font-size: 32px;
   line-height: 150%;
   color: #000;
 `;
+
 export const AnalysisTitleContainer = styled.div`
   grid-column: span 12;
   max-height: 48px;
 `;
+
 export const TableWrapper = styled.div`
   height: 540px;
   grid-column: span 8;
   background-color: #fff;
   box-shadow: 0 20px 67px -12px rgba(0, 0, 0, 0.13);
   border-radius: 30px;
-  padding: 32px 32px;
-  display: block;
+  padding: 32px;
 `;
 
 export const TableTitle = styled.h3`
@@ -53,6 +56,7 @@ export function AnalysisPage() {
       <AnalysisTitleContainer>
         <AnalysisTitle>Анализ расходов</AnalysisTitle>
       </AnalysisTitleContainer>
+
       <CalendarWrapper>
         <Calendar />
       </CalendarWrapper>
