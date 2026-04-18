@@ -7,14 +7,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-const data = [
-  { name: "Еда", value: 3590, color: "#d9b6ff" },
-  { name: "Транспорт", value: 1835, color: "#ffb53d" },
-  { name: "Жильё", value: 0, color: "#6ee4fe" },
-  { name: "Развлечения", value: 1250, color: "#b0aeff" },
-  { name: "Образование", value: 600, color: "#bcec30" },
-  { name: "Другое", value: 2306, color: "#ffb9b8" },
-];
+
 
 const CustomLabel = ({ x, y, width, value }) => {
   return (
@@ -31,11 +24,11 @@ const CustomLabel = ({ x, y, width, value }) => {
   );
 };
 
-export const AnalysisTable = () => {
+export const AnalysisTable = ({data}) => {
   return (
     <div style={{ maxWidth: "100%", height: 300 }}>
       <ResponsiveContainer>
-        <BarChart data={data} margin={{ top: 30 }}>
+        <BarChart data={data || []} margin={{ top: 30 }}>
           <XAxis
             dataKey="name"
             axisLine={false}
@@ -51,7 +44,7 @@ export const AnalysisTable = () => {
             label={<CustomLabel />}
             minPointSize={2}
           >
-            {data.map((entry, index) => (
+            {data?.map((entry, index) => (
               <Cell key={index} fill={entry.color} />
             ))}
           </Bar>

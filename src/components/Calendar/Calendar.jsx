@@ -1,10 +1,9 @@
-import React from 'react';
-import * as S from './Calendar.styled';
+import React from "react";
+import * as S from "./Calendar.styled";
 
+export function Calendar({ onSelectDate }) {
+  const daysOfWeek = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 
-export function Calendar() {
-  const daysOfWeek = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
-  
   const getDaysInMonth = (month, year) => {
     const date = new Date(year, month, 1);
     const days = [];
@@ -27,8 +26,10 @@ export function Calendar() {
   for (let i = -12; i <= 24; i++) {
     const targetDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
     monthsData.push({
-      name: targetDate.toLocaleString('ru', { month: 'long', year: 'numeric' }),
-      days: getDaysInMonth(targetDate.getMonth(), targetDate.getFullYear())
+      name: targetDate.toLocaleString("ru", { month: "long", year: "numeric" }),
+      days: getDaysInMonth(targetDate.getMonth(), targetDate.getFullYear()),
+      monthIndex: targetDate.getMonth(),
+      year: targetDate.getFullYear(),
     });
   }
 
@@ -40,7 +41,7 @@ export function Calendar() {
 
       <S.StickyWeekDays>
         <S.DaysGridHeader>
-          {daysOfWeek.map(day => (
+          {daysOfWeek.map((day) => (
             <S.DayName key={day}>{day}</S.DayName>
           ))}
         </S.DaysGridHeader>
@@ -52,7 +53,21 @@ export function Calendar() {
             <S.MonthLabel>{month.name}</S.MonthLabel>
             <S.DaysGrid>
               {month.days.map((item, idx) => (
-                <S.DayCell key={idx} $isEmpty={!item.day}>
+                <S.DayCell
+                  key={idx}
+                  $isEmpty={!item.day}
+                  onClick={() => {
+                    if (!item.day) return;
+
+                    const selectedDate = new Date(
+                      month.year,
+                      month.monthIndex,
+                      item.day,
+                    );
+
+                    onSelectDate(selectedDate);
+                  }}
+                >
                   {item.day}
                 </S.DayCell>
               ))}

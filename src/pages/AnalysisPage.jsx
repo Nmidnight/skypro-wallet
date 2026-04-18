@@ -1,6 +1,9 @@
 import styled from "styled-components";
 import { AnalysisTable } from "../components/AnalysisTable/AnalysisTable";
 import { Calendar } from "../components/Calendar/Calendar";
+import { useEffect, useState } from "react";
+import { getTransactionsByPeriod } from "../services/Api";
+import { transformTransactions } from "../utils/transformTransactions";
 
 const AnalysisPageContainer = styled.div`
   width: 100vw;
@@ -51,6 +54,35 @@ export const TableText = styled.p`
 `;
 
 export function AnalysisPage() {
+  const [data, setData] = useState([]);
+
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const formatDate = (date) => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    return `${month}-${day}-${year}`;
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const transactions = await getTransactionsByPeriod(
+          formatDate(selectedDate),
+          formatDate(selectedDate),
+        );
+
+        const chartData = transformTransactions(transactions);
+        setData(chartData);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    load();
+  }, [selectedDate]);
   return (
     <AnalysisPageContainer>
       <AnalysisTitleContainer>
@@ -58,7 +90,7 @@ export function AnalysisPage() {
       </AnalysisTitleContainer>
 
       <CalendarWrapper>
-        <Calendar />
+        <Calendar onSelectDate={setSelectedDate} />
       </CalendarWrapper>
 
       <TableWrapper>
@@ -66,7 +98,7 @@ export function AnalysisPage() {
         <TableText>
           Расходы за <span style={{ fontWeight: 600 }}>10 июля 2024</span>
         </TableText>
-        <AnalysisTable />
+        <AnalysisTable data={data} />
       </TableWrapper>
     </AnalysisPageContainer>
   );
