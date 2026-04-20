@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import * as S from "./Calendar.styled";
 
-export function Calendar({ onSelectDate }) {
+export function Calendar({ setPeriod }) {
   const daysOfWeek = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const getDaysInMonth = (month, year) => {
     const date = new Date(year, month, 1);
@@ -32,6 +34,31 @@ export function Calendar({ onSelectDate }) {
       year: targetDate.getFullYear(),
     });
   }
+  const handleSelect = (date) => {
+    if (!startDate || (startDate && endDate)) {
+      setStartDate(date);
+      setEndDate(null);
+      setPeriod({ start: date, end: date });
+    } else {
+      if (date < startDate) {
+        setEndDate(startDate);
+        setStartDate(date);
+        setPeriod({ start: date, end: startDate });
+      } else {
+        setEndDate(date);
+        setPeriod({ start: startDate, end: date });
+      }
+    }
+  };
+  const isSelected = (date) =>
+    (startDate && date.getTime() === startDate.getTime()) ||
+    (endDate && date.getTime() === endDate.getTime());
+
+  const inRange = (date) =>
+    startDate &&
+    endDate &&
+    date.getTime() > startDate.getTime() &&
+    date.getTime() < endDate.getTime();
 
   return (
     <S.CalendarWrapper>
@@ -52,25 +79,33 @@ export function Calendar({ onSelectDate }) {
           <S.MonthSection key={month.name}>
             <S.MonthLabel>{month.name}</S.MonthLabel>
             <S.DaysGrid>
-              {month.days.map((item, idx) => (
-                <S.DayCell
-                  key={idx}
-                  $isEmpty={!item.day}
-                  onClick={() => {
-                    if (!item.day) return;
+              {month.days.map((item, idx) => {
+                if (!item.day) {
+                  return (
+                    <S.DayCell key={idx} $isEmpty>
+                      {null}
+                    </S.DayCell>
+                  );
+                }
 
-                    const selectedDate = new Date(
-                      month.year,
-                      month.monthIndex,
-                      item.day,
-                    );
+                const currentDate = new Date(
+                  month.year,
+                  month.monthIndex,
+                  item.day,
+                );
 
-                    onSelectDate(selectedDate);
-                  }}
-                >
-                  {item.day}
-                </S.DayCell>
-              ))}
+                return (
+                  <S.DayCell
+                    key={idx}
+                    $isEmpty={false}
+                    $isSelected={isSelected(currentDate)}
+                    $inRange={inRange(currentDate)}
+                    onClick={() => handleSelect(currentDate)}
+                  >
+                    {item.day}
+                  </S.DayCell>
+                );
+              })}
             </S.DaysGrid>
           </S.MonthSection>
         ))}

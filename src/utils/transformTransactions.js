@@ -18,8 +18,9 @@ const colors = {
 
 export const transformTransactions = (transactions) => {
   const sums = {};
-
+  let totalSum = 0;
   transactions.forEach((t) => {
+    totalSum += t.sum;
     if (!sums[t.category]) {
       sums[t.category] = 0;
     }
@@ -27,6 +28,7 @@ export const transformTransactions = (transactions) => {
   });
 
   return Object.keys(categoryMap).map((key) => ({
+    totalSum,
     name: categoryMap[key],
     value: sums[key] || 0,
     color: colors[key],

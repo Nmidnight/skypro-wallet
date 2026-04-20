@@ -115,4 +115,17 @@ export const DayCell = styled.div`
       border-radius: 50%;
     }
   `}
+  ${props => props.$inRange && `
+    background-color: #F1EBFD;
+    color: #7B61FF;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 6px;
+      width: 4px;
+      height: 4px;
+      background-color: #7B61FF;
+      border-radius: 50%;
+    }
+  `}
 `;

@@ -56,22 +56,25 @@ export const TableText = styled.p`
 export function AnalysisPage() {
   const [data, setData] = useState([]);
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [period, setPeriod] = useState({ start: null, end: null });
 
   const formatDate = (date) => {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const year = date.getFullYear();
+    const d = new Date(date);
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const year = d.getFullYear();
 
     return `${month}-${day}-${year}`;
   };
 
   useEffect(() => {
+    if (!period.start || !period.end) return;
+
     const load = async () => {
       try {
         const transactions = await getTransactionsByPeriod(
-          formatDate(selectedDate),
-          formatDate(selectedDate),
+          period.start,
+          period.end,
         );
 
         const chartData = transformTransactions(transactions);
@@ -82,7 +85,7 @@ export function AnalysisPage() {
     };
 
     load();
-  }, [selectedDate]);
+  }, [period]);
   return (
     <AnalysisPageContainer>
       <AnalysisTitleContainer>
@@ -90,15 +93,18 @@ export function AnalysisPage() {
       </AnalysisTitleContainer>
 
       <CalendarWrapper>
-        <Calendar onSelectDate={setSelectedDate} />
+        <Calendar setPeriod={setPeriod} />
       </CalendarWrapper>
 
       <TableWrapper>
         <TableTitle>9 581 ₽</TableTitle>
         <TableText>
-          Расходы за <span style={{ fontWeight: 600 }}>10 июля 2024</span>
+          Расходы за{" "}
+          <span style={{ fontWeight: 600 }}>
+            {formatDate(period.start)} — {formatDate(period.end)}
+          </span>
         </TableText>
-        <AnalysisTable data={data} />
+        {data.length > 0 && <AnalysisTable data={data} />}
       </TableWrapper>
     </AnalysisPageContainer>
   );
