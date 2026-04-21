@@ -1,13 +1,11 @@
-import React from 'react';
-import * as S from './Calendar.styled';
+import React, { useState } from "react";
+import * as S from "./Calendar.styled";
 
-// заменил react-day-picker 9.x. на react-calendar 
-// причина война стилей. я замумукался
-// в react-day-picker 9.x очень жестко прописаны стили грид
+export function Calendar({ setPeriod }) {
+  const daysOfWeek = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
-export function Calendar() {
-  const daysOfWeek = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
-  
   const getDaysInMonth = (month, year) => {
     const date = new Date(year, month, 1);
     const days = [];
@@ -15,24 +13,52 @@ export function Calendar() {
     if (firstDayPos === -1) firstDayPos = 6;
 
     for (let i = 0; i < firstDayPos; i++) days.push({ day: null });
+
     while (date.getMonth() === month) {
       days.push({ day: date.getDate() });
       date.setDate(date.getDate() + 1);
     }
+
     return days;
   };
 
   const monthsData = [];
   const now = new Date();
 
-  // Календарь от -12 месяцев назад до +24 месяцев вперед и того рендерим 36 месяцев
   for (let i = -12; i <= 24; i++) {
     const targetDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
     monthsData.push({
-      name: targetDate.toLocaleString('ru', { month: 'long', year: 'numeric' }),
-      days: getDaysInMonth(targetDate.getMonth(), targetDate.getFullYear())
+      name: targetDate.toLocaleString("ru", { month: "long", year: "numeric" }),
+      days: getDaysInMonth(targetDate.getMonth(), targetDate.getFullYear()),
+      monthIndex: targetDate.getMonth(),
+      year: targetDate.getFullYear(),
     });
   }
+  const handleSelect = (date) => {
+    if (!startDate || (startDate && endDate)) {
+      setStartDate(date);
+      setEndDate(null);
+      setPeriod({ start: date, end: date });
+    } else {
+      if (date < startDate) {
+        setEndDate(startDate);
+        setStartDate(date);
+        setPeriod({ start: date, end: startDate });
+      } else {
+        setEndDate(date);
+        setPeriod({ start: startDate, end: date });
+      }
+    }
+  };
+  const isSelected = (date) =>
+    (startDate && date.getTime() === startDate.getTime()) ||
+    (endDate && date.getTime() === endDate.getTime());
+
+  const inRange = (date) =>
+    startDate &&
+    endDate &&
+    date.getTime() > startDate.getTime() &&
+    date.getTime() < endDate.getTime();
 
   return (
     <S.CalendarWrapper>
@@ -42,7 +68,7 @@ export function Calendar() {
 
       <S.StickyWeekDays>
         <S.DaysGridHeader>
-          {daysOfWeek.map(day => (
+          {daysOfWeek.map((day) => (
             <S.DayName key={day}>{day}</S.DayName>
           ))}
         </S.DaysGridHeader>
@@ -53,11 +79,33 @@ export function Calendar() {
           <S.MonthSection key={month.name}>
             <S.MonthLabel>{month.name}</S.MonthLabel>
             <S.DaysGrid>
-              {month.days.map((item, idx) => (
-                <S.DayCell key={idx} $isEmpty={!item.day}>
-                  {item.day}
-                </S.DayCell>
-              ))}
+              {month.days.map((item, idx) => {
+                if (!item.day) {
+                  return (
+                    <S.DayCell key={idx} $isEmpty>
+                      {null}
+                    </S.DayCell>
+                  );
+                }
+
+                const currentDate = new Date(
+                  month.year,
+                  month.monthIndex,
+                  item.day,
+                );
+
+                return (
+                  <S.DayCell
+                    key={idx}
+                    $isEmpty={false}
+                    $isSelected={isSelected(currentDate)}
+                    $inRange={inRange(currentDate)}
+                    onClick={() => handleSelect(currentDate)}
+                  >
+                    {item.day}
+                  </S.DayCell>
+                );
+              })}
             </S.DaysGrid>
           </S.MonthSection>
         ))}
