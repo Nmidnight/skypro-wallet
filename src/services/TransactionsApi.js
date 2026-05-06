@@ -31,7 +31,7 @@ export async function getTransactions(token) {
 
 export async function createTransaction(token, transaction) {
     try {
-        const response = await api.post("/transactions", transaction, {
+        const response = await api.post("/transactions", JSON.stringify(transaction), {
             headers: {
                 ...getAuthConfig(token).headers,
                 "Content-Type": "",

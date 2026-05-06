@@ -93,6 +93,18 @@ export const ExpenseCell = styled.div`
   }
 `;
 
+export const StateMessage = styled.div`
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #999999;
+  padding: 7px 0;
+
+  &.error {
+    color: #f25050;
+  }
+`;
+
 export const DeleteIcon = styled.div`
   display: flex;
   justify-content: flex-end;
