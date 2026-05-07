@@ -5,7 +5,9 @@ export const api = axios.create({
 });
 
 export const getTransactionsByPeriod = async (start, end) => {
-  const token = JSON.parse(localStorage.getItem("user"))?.token;
+  const token =
+    JSON.parse(localStorage.getItem("userInfo"))?.token ||
+    localStorage.getItem("token");
 
   
 

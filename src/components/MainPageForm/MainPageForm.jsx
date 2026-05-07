@@ -94,6 +94,7 @@ export function MainPageForm({ onTransactionCreated }) {
       [name]: error,
     }));
   };
+
   const isFormValid =
     description &&
     selectedCategory &&
@@ -154,6 +155,7 @@ export function MainPageForm({ onTransactionCreated }) {
       setIsSubmitting(false);
     }
   };
+
   return (
     <MainFormcontainer onSubmit={handleSubmit}>
       <MainFormTitle>Новый расход</MainFormTitle>
@@ -248,8 +250,8 @@ export function MainPageForm({ onTransactionCreated }) {
       {submitError && (
         <span style={{ color: "#F25050", fontSize: "12px" }}>{submitError}</span>
       )}
-      <FormButton type="submit" disabled={!isFormValid}>
-        {isSubmitting ? "Добавляем..." : "Добавить новый расход"}
+      <FormButton type="submit" disabled={!isFormValid || isSubmitting}>
+        {isSubmitting ? "Добавление..." : "Добавить новый расход"}
       </FormButton>
     </MainFormcontainer>
   );

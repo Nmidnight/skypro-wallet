@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import * as S from "./Calendar.styled";
 
-export function Calendar({ setPeriod }) {
+export function Calendar({ setPeriod, initialStartDate = null, initialEndDate = null }) {
   const daysOfWeek = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState(initialStartDate);
+  const [endDate, setEndDate] = useState(initialEndDate);
 
   const getDaysInMonth = (month, year) => {
     const date = new Date(year, month, 1);

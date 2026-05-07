@@ -1,10 +1,10 @@
-import * as S from './ExpensesTable.styled';
-import { MainPageForm } from '../MainPageForm/MainPageForm';
+import * as S from "./ExpensesTable.styled";
+import { MainPageForm } from "../MainPageForm/MainPageForm";
 import {
   categoryLabels,
   formatRubles,
   formatTransactionDate,
-} from '../../utils/transactionsFormatters';
+} from "../../utils/transactionsFormatters";
 
 export const ExpensesTable = ({
   transactions,
@@ -44,9 +44,13 @@ export const ExpensesTable = ({
             transactions.map((item) => (
               <S.ExpenseRow key={item.id || item._id}>
                 <S.ExpenseCell>{item.description}</S.ExpenseCell>
-                <S.ExpenseCell>{categoryLabels[item.category] || item.category}</S.ExpenseCell>
+                <S.ExpenseCell>
+                  {categoryLabels[item.category] || item.category}
+                </S.ExpenseCell>
                 <S.ExpenseCell>{formatTransactionDate(item.date)}</S.ExpenseCell>
-                <S.ExpenseCell className="amount">{formatRubles(item.sum)}</S.ExpenseCell>
+                <S.ExpenseCell className="amount">
+                  {formatRubles(item.sum)}
+                </S.ExpenseCell>
                 <S.DeleteIcon>
                   <img src="/svg/Frame_1511838850.svg" alt="Удалить" />
                 </S.DeleteIcon>
@@ -56,7 +60,6 @@ export const ExpensesTable = ({
       </S.ExpensesCard>
 
       <MainPageForm onTransactionCreated={onTransactionCreated} />
-
     </S.PageContainer>
   );
 };
