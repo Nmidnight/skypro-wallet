@@ -16,7 +16,7 @@ import {
   MainFormTitle,
 } from "./MainPageForm.styled";
 
-export function MainPageForm() {
+export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
   const categories = [
     { name: "Еда", icon: food },
     { name: "Транспорт", icon: car },
@@ -33,6 +33,14 @@ export function MainPageForm() {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const categoryMap = {
+    Еда: "food",
+    Транспорт: "transport",
+    Жилье: "housing",
+    Развлечения: "joy",
+    Образование: "education",
+    Другое: "others",
+  };
 
   const validate = (name, value) => {
     let error = "";
@@ -95,13 +103,32 @@ export function MainPageForm() {
     !errors.description &&
     !errors.date &&
     !errors.amount;
-  const handleSubmit = (e) => {
+  const toApiDate = (value) => {
+    const [day, month, year] = value.split(".");
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ description, date, amount, selectedCategory });
+    if (!isFormValid || isSubmitting) {
+      return;
+    }
+
+    if (onAddTransaction) {
+      await onAddTransaction({
+        comment: description.trim(),
+        date: toApiDate(date),
+        sum: Number(amount),
+        category: categoryMap[selectedCategory] || selectedCategory,
+      });
+    }
+
     setDescription("");
     setDate("");
     setAmount("");
     setSelectedCategory(null);
+    setErrors({});
+    setTouched({});
   };
   return (
     <MainFormcontainer onSubmit={handleSubmit}>
@@ -194,8 +221,8 @@ export function MainPageForm() {
           $success={touched.amount && !errors.amount && amount}
         />
       </ContentContainer>
-      <FormButton type="submit" disabled={!isFormValid}>
-        Добавить новый расход
+      <FormButton type="submit" disabled={!isFormValid || isSubmitting}>
+        {isSubmitting ? "Добавление..." : "Добавить новый расход"}
       </FormButton>
     </MainFormcontainer>
   );

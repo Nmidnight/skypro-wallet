@@ -1,28 +1,85 @@
-import React from 'react';
-import * as S from './ExpensesTable.styled';
-import { MainPageForm } from '../MainPageForm/MainPageForm';
+import React, { useCallback, useEffect, useState } from "react";
+import * as S from "./ExpensesTable.styled";
+import { MainPageForm } from "../MainPageForm/MainPageForm";
+import { createTransaction, getTransactions } from "../../services/TransactionsApi";
+import { useAuth } from "../../context/AuthContext/useAuth";
+import { notify } from "../../utils/notify";
 
-const mockExpenses = [
-  { id: 1, name: 'Пятерочка', category: 'Еда', date: '03.07.2024', amount: '3 500 ₽' },
-  { id: 2, name: 'Яндекс Такси', category: 'Транспорт', date: '03.07.2024', amount: '730 ₽' },
-  { id: 3, name: 'Аптека Вита', category: 'Другое', date: '03.07.2024', amount: '1 200 ₽' },
-  { id: 4, name: 'Бургер Кинг', category: 'Еда', date: '03.07.2024', amount: '950 ₽' },
-  { id: 5, name: 'Деливери', category: 'Еда', date: '02.07.2024', amount: '1 320 ₽' },
-  { id: 6, name: 'Кофейня №1', category: 'Еда', date: '02.07.2024', amount: '400 ₽' },
-  { id: 7, name: 'Бильярд', category: 'Развлечения', date: '29.06.2024', amount: '600 ₽' },
-  { id: 8, name: 'Перекресток', category: 'Еда', date: '29.06.2024', amount: '2 360 ₽' },
-  { id: 9, name: 'Лукойл', category: 'Транспорт', date: '29.06.2024', amount: '1 000 ₽' },
-  { id: 10, name: 'Летуаль', category: 'Другое', date: '29.06.2024', amount: '4 300 ₽' },
-  { id: 11, name: 'Яндекс Такси', category: 'Транспорт', date: '28.06.2024', amount: '320 ₽' },
-  { id: 12, name: 'Перекресток', category: 'Еда', date: '28.06.2024', amount: '1 360 ₽' },
-  { id: 13, name: 'Деливери', category: 'Еда', date: '28.06.2024', amount: '2 320 ₽' },
-  { id: 14, name: 'Вкусвилл', category: 'Еда', date: '27.06.2024', amount: '1 220 ₽' },
-  { id: 15, name: 'Кофейня №1', category: 'Еда', date: '27.06.2024', amount: '920 ₽' },
-  { id: 16, name: 'Вкусвилл', category: 'Еда', date: '26.06.2024', amount: '840 ₽' },
-  { id: 17, name: 'Кофейня №1', category: 'Еда', date: '26.06.2024', amount: '920 ₽' },
-];
+const categoryMap = {
+  food: "Еда",
+  transport: "Транспорт",
+  housing: "Жилье",
+  joy: "Развлечения",
+  education: "Образование",
+  others: "Другое",
+};
+
+const formatAmount = (sum) =>
+  `${Number(sum || 0).toLocaleString("ru-RU")} ₽`;
+
+const formatDate = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value || "-";
+  return date.toLocaleDateString("ru-RU");
+};
+
+const normalizeTransactions = (response) => {
+  const list = Array.isArray(response)
+    ? response
+    : response?.transactions || response?.data || [];
+
+  if (!Array.isArray(list)) {
+    return [];
+  }
+
+  return list.map((item, idx) => ({
+    id: item.id || item._id || `${item.comment || "transaction"}-${idx}`,
+    name: item.comment || item.name || "Без описания",
+    category: categoryMap[item.category] || item.category || "Другое",
+    date: formatDate(item.date || item.createdAt),
+    amount: formatAmount(item.sum),
+  }));
+};
 
 export const ExpensesTable = () => {
+  const { token } = useAuth();
+  const [expenses, setExpenses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const loadTransactions = useCallback(async () => {
+    if (!token) return;
+
+    setIsLoading(true);
+    try {
+      const response = await getTransactions(token);
+      setExpenses(normalizeTransactions(response));
+    } catch (error) {
+      notify.error(error?.message || "Не удалось загрузить транзакции");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    loadTransactions();
+  }, [loadTransactions]);
+
+  const handleCreateTransaction = async (payload) => {
+    if (!token) return;
+    setIsSubmitting(true);
+
+    try {
+      await createTransaction(token, payload);
+      notify.success("Расход добавлен");
+      await loadTransactions();
+    } catch (error) {
+      notify.error(error?.message || "Не удалось добавить расход");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <S.PageContainer>
       <S.GlobalBackground />
@@ -40,21 +97,28 @@ export const ExpensesTable = () => {
         </S.ExpensesCard__Header>
 
         <S.ExpensesList>
-          {mockExpenses.map((item) => (
-            <S.ExpenseRow key={item.id}>
-              <S.ExpenseCell>{item.name}</S.ExpenseCell>
-              <S.ExpenseCell>{item.category}</S.ExpenseCell>
-              <S.ExpenseCell>{item.date}</S.ExpenseCell>
-              <S.ExpenseCell className="amount">{item.amount}</S.ExpenseCell>
-              <S.DeleteIcon>
-                <img src="/svg/Frame_1511838850.svg" alt="Удалить" />
-              </S.DeleteIcon>
-            </S.ExpenseRow>
-          ))}
+          {isLoading ? (
+            <S.ExpenseCell>Загрузка...</S.ExpenseCell>
+          ) : (
+            expenses.map((item) => (
+              <S.ExpenseRow key={item.id}>
+                <S.ExpenseCell>{item.name}</S.ExpenseCell>
+                <S.ExpenseCell>{item.category}</S.ExpenseCell>
+                <S.ExpenseCell>{item.date}</S.ExpenseCell>
+                <S.ExpenseCell className="amount">{item.amount}</S.ExpenseCell>
+                <S.DeleteIcon>
+                  <img src="/svg/Frame_1511838850.svg" alt="Удалить" />
+                </S.DeleteIcon>
+              </S.ExpenseRow>
+            ))
+          )}
         </S.ExpensesList>
       </S.ExpensesCard>
 
-      <MainPageForm />
+      <MainPageForm
+        onAddTransaction={handleCreateTransaction}
+        isSubmitting={isSubmitting}
+      />
 
     </S.PageContainer>
   );

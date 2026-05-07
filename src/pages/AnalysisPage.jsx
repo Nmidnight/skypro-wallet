@@ -55,8 +55,9 @@ export const TableText = styled.p`
 
 export function AnalysisPage() {
   const [data, setData] = useState([]);
+  const today = new Date();
 
-  const [period, setPeriod] = useState({ start: null, end: null });
+  const [period, setPeriod] = useState({ start: today, end: today });
 
   const formatDate = (date) => {
     const d = new Date(date);
@@ -93,7 +94,7 @@ export function AnalysisPage() {
       </AnalysisTitleContainer>
 
       <CalendarWrapper>
-        <Calendar setPeriod={setPeriod} />
+        <Calendar setPeriod={setPeriod} initialStartDate={today} initialEndDate={today} />
       </CalendarWrapper>
 
       <TableWrapper>
