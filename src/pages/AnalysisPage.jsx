@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { getTransactionsByPeriod } from "../services/Api";
 import { transformTransactions } from "../utils/transformTransactions";
 
+import { useLocation, useNavigate } from "react-router-dom";
+
 const AnalysisPageContainer = styled.div`
   width: 100vw;
   height: 100vh;
@@ -13,10 +15,20 @@ const AnalysisPageContainer = styled.div`
   grid-template-columns: repeat(12, 1fr);
   gap: 32px;
   background-color: #f4f5f6;
+  @media (max-width: 768px) {
+    padding: 0 50px;
+    gap: 24px;
+  }
+  @media (max-width: 460px) {
+    padding: 0 16px;
+  }
 `;
 
 export const CalendarWrapper = styled.div`
   grid-column: span 4;
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const AnalysisTitle = styled.h2`
@@ -24,6 +36,10 @@ export const AnalysisTitle = styled.h2`
   font-size: 32px;
   line-height: 150%;
   color: #000;
+  @media (max-width: 768px) {
+    font-size: 24px;
+    line-height: 100%;
+  }
 `;
 
 export const AnalysisTitleContainer = styled.div`
@@ -38,6 +54,11 @@ export const TableWrapper = styled.div`
   box-shadow: 0 20px 67px -12px rgba(0, 0, 0, 0.13);
   border-radius: 30px;
   padding: 32px;
+  @media (max-width: 768px) {
+    grid-column: span 12;
+    border-radius: 0px;
+    padding: 0;
+  }
 `;
 
 export const TableTitle = styled.h3`
@@ -52,21 +73,43 @@ export const TableText = styled.p`
   font-size: 12px;
   color: #999;
 `;
+export const AnalysisBtnBox = styled.div`
+  height: 87px;
+  grid-column: span 12;
+  width: 100%;
+  background: #fff;
+  justify-content: center;
+  align-items: center;
+  display: none;
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+export const AnalysisBtn = styled.button`
+  border-radius: 6px;
+  padding: 12px;
+
+  height: 39px;
+  background: #7334ea;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  color: #fff;
+  border: none;
+`;
 
 export function AnalysisPage() {
   const [data, setData] = useState([]);
   const today = new Date();
 
-  const [period, setPeriod] = useState({ start: today, end: today });
+  const location = useLocation();
 
-  const formatDate = (date) => {
-    const d = new Date(date);
-    const month = d.getMonth() + 1;
-    const day = d.getDate();
-    const year = d.getFullYear();
-
-    return `${month}-${day}-${year}`;
-  };
+  const [period, setPeriod] = useState(
+    location.state?.period || {
+      start: today,
+      end: today,
+    },
+  );
 
   useEffect(() => {
     if (!period.start || !period.end) return;
@@ -87,6 +130,14 @@ export function AnalysisPage() {
 
     load();
   }, [period]);
+  const formatDisplayDate = (date) => {
+    return new Date(date).toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+  const navigate = useNavigate();
   return (
     <AnalysisPageContainer>
       <AnalysisTitleContainer>
@@ -94,7 +145,11 @@ export function AnalysisPage() {
       </AnalysisTitleContainer>
 
       <CalendarWrapper>
-        <Calendar setPeriod={setPeriod} initialStartDate={today} initialEndDate={today} />
+        <Calendar
+          setPeriod={setPeriod}
+          initialStartDate={today}
+          initialEndDate={today}
+        />
       </CalendarWrapper>
 
       <TableWrapper>
@@ -102,11 +157,16 @@ export function AnalysisPage() {
         <TableText>
           Расходы за{" "}
           <span style={{ fontWeight: 600 }}>
-            {formatDate(period.start)} — {formatDate(period.end)}
+            {formatDisplayDate(period.start)} — {formatDisplayDate(period.end)}
           </span>
         </TableText>
         {data.length > 0 && <AnalysisTable data={data} />}
       </TableWrapper>
+      <AnalysisBtnBox>
+        <AnalysisBtn onClick={() => navigate("/analysis/calendar")}>
+          Выбрать другой период
+        </AnalysisBtn>
+      </AnalysisBtnBox>
     </AnalysisPageContainer>
   );
 }
