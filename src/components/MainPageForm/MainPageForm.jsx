@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext/useAuth";
+import { createTransaction } from "../../services/TransactionsApi";
+import { categoryValues, toApiDate } from "../../utils/transactionsFormatters";
 import food from "../../assets/icon-food.svg?react";
 import car from "../../assets/icon-car.svg?react";
 import house from "../../assets/icon-house.svg?react";
@@ -16,7 +19,9 @@ import {
   MainFormTitle,
 } from "./MainPageForm.styled";
 
-export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
+export function MainPageForm({ onTransactionCreated }) {
+  const { token } = useAuth();
+
   const categories = [
     { name: "Еда", icon: food },
     { name: "Транспорт", icon: car },
@@ -33,14 +38,8 @@ export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const categoryMap = {
-    Еда: "food",
-    Транспорт: "transport",
-    Жилье: "housing",
-    Развлечения: "joy",
-    Образование: "education",
-    Другое: "others",
-  };
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = (name, value) => {
     let error = "";
@@ -50,8 +49,8 @@ export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
 
       if (!trimmed) {
         error = "Введите описание";
-      } else if (trimmed.length < 3) {
-        error = "Минимум 3 символа";
+      } else if (trimmed.length < 4) {
+        error = "Минимум 4 символа";
       } else if (trimmed.length > 50) {
         error = "Слишком длинное описание";
       }
@@ -68,7 +67,7 @@ export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
           error = "Формат даты: ДД.ММ.ГГГГ";
         } else {
           const [day, month, year] = value.split(".");
-          const dateObj = new Date(`${year}-${month}-${day}`);
+          const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
 
           if (
             dateObj.getDate() !== Number(day) ||
@@ -83,8 +82,8 @@ export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
     if (name === "amount") {
       if (!value) {
         error = "Введите сумму";
-      } else if (!/^\d+(\.\d{1,2})?$/.test(value)) {
-        error = "Максимум 2 знака после запятой";
+      } else if (!/^\d+$/.test(value)) {
+        error = "Введите целое число";
       } else if (Number(value) <= 0) {
         error = "Сумма должна быть больше 0";
       }
@@ -95,6 +94,7 @@ export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
       [name]: error,
     }));
   };
+
   const isFormValid =
     description &&
     selectedCategory &&
@@ -102,27 +102,10 @@ export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
     amount &&
     !errors.description &&
     !errors.date &&
-    !errors.amount;
-  const toApiDate = (value) => {
-    const [day, month, year] = value.split(".");
-    return `${year}-${month}-${day}`;
-  };
+    !errors.amount &&
+    !isSubmitting;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isFormValid || isSubmitting) {
-      return;
-    }
-
-    if (onAddTransaction) {
-      await onAddTransaction({
-        comment: description.trim(),
-        date: toApiDate(date),
-        sum: Number(amount),
-        category: categoryMap[selectedCategory] || selectedCategory,
-      });
-    }
-
+  const resetForm = () => {
     setDescription("");
     setDate("");
     setAmount("");
@@ -130,6 +113,49 @@ export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
     setErrors({});
     setTouched({});
   };
+
+  const markAllTouched = () => {
+    setTouched({
+      description: true,
+      date: true,
+      amount: true,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    validate("description", description);
+    validate("date", date);
+    validate("amount", amount);
+    markAllTouched();
+
+    const sum = Number(amount);
+    const category = categoryValues[selectedCategory];
+
+    if (!isFormValid || !category || !Number.isInteger(sum) || sum <= 0) {
+      return;
+    }
+
+    setSubmitError("");
+    setIsSubmitting(true);
+
+    try {
+      await createTransaction(token, {
+        description: description.trim(),
+        category,
+        date: toApiDate(date),
+        sum,
+      });
+      resetForm();
+      await onTransactionCreated?.();
+    } catch (err) {
+      setSubmitError(err.message || "Не удалось добавить расход");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <MainFormcontainer onSubmit={handleSubmit}>
       <MainFormTitle>Новый расход</MainFormTitle>
@@ -221,6 +247,9 @@ export function MainPageForm({ onAddTransaction, isSubmitting = false }) {
           $success={touched.amount && !errors.amount && amount}
         />
       </ContentContainer>
+      {submitError && (
+        <span style={{ color: "#F25050", fontSize: "12px" }}>{submitError}</span>
+      )}
       <FormButton type="submit" disabled={!isFormValid || isSubmitting}>
         {isSubmitting ? "Добавление..." : "Добавить новый расход"}
       </FormButton>
