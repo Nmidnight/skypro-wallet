@@ -17,7 +17,6 @@ import arrow from "../../assets/header-arrow.svg";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext/useAuth";
 
-
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => {
@@ -30,7 +29,6 @@ export function Header() {
     authLogout();
   };
 
-
   const location = useLocation();
   const onlyLogoPath = ["/signin", "/signup"];
   const showOnlyLogo = onlyLogoPath.includes(location.pathname);
@@ -39,6 +37,8 @@ export function Header() {
       case "/":
         return "Мои расходы";
       case "/analysis":
+        return "Анализ расходов";
+      case "/analysis/calendar":
         return "Анализ расходов";
       default:
         return "";
