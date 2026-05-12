@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   HeaderContainer,
   HeaderLogoLink,
@@ -11,15 +11,16 @@ import {
   HeaderArrowImg,
   MobileMenu,
   MobileLink,
+  MobileMenuButton,
 } from "./Header.styled";
 import logo from "../../assets/header-logo.svg";
 import arrow from "../../assets/header-arrow.svg";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext/useAuth";
 
-
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -28,8 +29,9 @@ export function Header() {
 
   const handleLogout = () => {
     authLogout();
+    setIsOpen(false);
+    navigate("/signin", { replace: true });
   };
-
 
   const location = useLocation();
   const onlyLogoPath = ["/signin", "/signup"];
@@ -39,6 +41,8 @@ export function Header() {
       case "/":
         return "Мои расходы";
       case "/analysis":
+        return "Анализ расходов";
+      case "/analysis/calendar":
         return "Анализ расходов";
       default:
         return "";
@@ -69,15 +73,26 @@ export function Header() {
             </HeaderArrowBtn>
             {isOpen && (
               <MobileMenu>
-                <MobileLink as={NavLink} to="/">
+                <MobileLink as={NavLink} to="/" end onClick={() => setIsOpen(false)}>
                   Мои расходы
                 </MobileLink>
-                <MobileLink as={NavLink} to="/">
+                <MobileLink
+                  as={Link}
+                  to="/#new-expense"
+                  onClick={() => setIsOpen(false)}
+                >
                   Новый расход
                 </MobileLink>
-                <MobileLink as={NavLink} to="/analysis">
+                <MobileLink
+                  as={NavLink}
+                  to="/analysis"
+                  onClick={() => setIsOpen(false)}
+                >
                   Анализ расходов
                 </MobileLink>
+                <MobileMenuButton type="button" onClick={handleLogout}>
+                  Выйти
+                </MobileMenuButton>
               </MobileMenu>
             )}
           </HeaderMobileBtn>

@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import food from "../../assets/icon-food.svg";
+
 export const MainFormcontainer = styled.form`
+  width: 100%;
   max-width: 379px;
   border-radius: 30px;
   box-shadow: 0 20px 67px -12px rgba(0, 0, 0, 0.13);
@@ -10,6 +11,7 @@ export const MainFormcontainer = styled.form`
   gap: 24px;
   align-items: start;
   padding: 32px 34px 32px 32px;
+  box-sizing: border-box;
 `;
 
 export const MainFormTitle = styled.h2`
@@ -58,7 +60,8 @@ export const FormInput = styled.input`
 `;
 
 export const CategoriesBox = styled.div`
-  width: 277px;
+  width: 100%;
+  max-width: 277px;
   display: flex;
   row-gap: 6px;
   column-gap: 6px;

@@ -1,85 +1,85 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import styled from "styled-components";
 import { ButtonDefault } from "../components/Button/Button.styled";
 import { Input } from "../components/Input/Input";
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext/useAuth';
-import { signinUser } from '../services/AuthApi';
-import { notify } from "../utils/notify"; // ДОБАВИЛИ ИМПОРТ
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext/useAuth";
+import { signinUser } from "../services/AuthApi";
+import { notify } from "../utils/notify";
 
 const PageWrapper = styled("div")({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  minHeight: '100vh',
-  backgroundColor: '#F5F5F5',
-  padding: '20px'
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  minHeight: "100vh",
+  backgroundColor: "#F5F5F5",
+  padding: "20px",
 });
 
 const FormContainer = styled("form")({
-  width: '360px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '12px',
-  padding: '50px 40px',
-  borderRadius: '30px',
-  boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-  backgroundColor: '#fff',
-  textAlign: 'center'
+  width: "100%",
+  maxWidth: "360px",
+  boxSizing: "border-box",
+  display: "flex",
+  flexDirection: "column",
+  gap: "12px",
+  padding: "50px 40px",
+  borderRadius: "30px",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
+  backgroundColor: "#fff",
+  textAlign: "center",
 });
 
 const Title = styled("h1")({
-  fontSize: '24px',
-  fontWeight: '700',
-  marginBottom: '20px',
+  fontSize: "24px",
+  fontWeight: "700",
+  marginBottom: "20px",
   fontFamily: "'Montserrat', sans-serif",
-  color: '#000'
+  color: "#000",
 });
 
-// Добавили компонент для серверной ошибки
 const ErrorMessage = styled("p")({
   color: "#FF4D4D",
   fontSize: "12px",
   fontFamily: "'Montserrat', sans-serif",
   margin: "0 0 10px 0",
   textAlign: "center",
-  lineHeight: "140%"
+  lineHeight: "140%",
 });
 
 const FooterText = styled("p")({
   fontFamily: "'Montserrat', sans-serif",
-  fontSize: '12px',
-  lineHeight: '150%',
-  textAlign: 'center',
-  color: '#999',
-  marginTop: '20px',
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  maxWidth: '180px',
-  '& a': {
-    color: '#999',
-    fontWeight: '600',
-    textDecoration: 'none',
-    display: 'block',
-    marginTop: '4px',
-    borderBottom: '1px solid #999',
-    width: 'fit-content',
-    margin: '4px auto 0',
-    paddingBottom: '1px'
-  }
+  fontSize: "12px",
+  lineHeight: "150%",
+  textAlign: "center",
+  color: "#999",
+  marginTop: "20px",
+  marginLeft: "auto",
+  marginRight: "auto",
+  maxWidth: "180px",
+  "& a": {
+    color: "#999",
+    fontWeight: "600",
+    textDecoration: "none",
+    display: "block",
+    marginTop: "4px",
+    borderBottom: "1px solid #999",
+    width: "fit-content",
+    margin: "4px auto 0",
+    paddingBottom: "1px",
+  },
 });
 
 export function SigninPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [serverError, setServerError] = useState(null); // Состояние для ошибки бэкенда
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [serverError, setServerError] = useState(null);
 
   const navigate = useNavigate();
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPasswordValid = password.length >= 8;
 
-  // Кнопка блокируется, если есть ошибка (ввели неверно)
   const emailError = email.length > 0 && !isEmailValid;
   const passwordError = password.length > 0 && !isPasswordValid;
   const isButtonDisabled = emailError || passwordError || !email || !password;
@@ -88,20 +88,23 @@ export function SigninPage() {
 
   async function handleSignIn(e) {
     e.preventDefault();
-    setServerError(null); // Сбрасываем старую ошибку
+    setServerError(null);
 
     try {
       const data = await signinUser({ login: email, password });
+
       authLogin(data);
+
       notify.success("Вход выполнен!");
       navigate("/");
-    }
-    catch (err) {
-      // Подхватываем текст ошибки от сервера
-      const errorMsg = err.response?.data?.message || err.response?.data?.error || "Неверный логин или пароль";
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Неверный логин или пароль";
+
       setServerError(errorMsg);
       notify.error(errorMsg);
-      console.error(errorMsg);
     }
   }
 
@@ -116,7 +119,7 @@ export function SigninPage() {
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            if (serverError) setServerError(null); // Убираем ошибку при вводе
+            if (serverError) setServerError(null);
           }}
           isSuccess={isEmailValid}
           isError={emailError}
@@ -129,21 +132,20 @@ export function SigninPage() {
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            if (serverError) setServerError(null); // Убираем ошибку при вводе
+            if (serverError) setServerError(null);
           }}
           isSuccess={isPasswordValid}
           isError={passwordError}
           errorMsg="Упс! Введенные вами данные некорректны. Введите данные корректно и повторите попытку."
         />
 
-        {/* Вывод серверной ошибки над кнопкой */}
         {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
 
         <ButtonDefault
           type="submit"
-          style={{ marginTop: '20px' }}
-          disabled={isButtonDisabled}  // Блокирует клик
-          $disabled={isButtonDisabled} // МЕНЯЕТ ЦВЕТ НА СЕРЫЙ
+          style={{ marginTop: "20px" }}
+          disabled={isButtonDisabled}
+          $disabled={isButtonDisabled}
         >
           Войти
         </ButtonDefault>
