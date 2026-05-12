@@ -19,7 +19,7 @@ export function AppRoutes() {
         <Route path="/" element={<Layout />}>
           <Route index element={<MainPage />} />
           <Route path="analysis" element={<AnalysisPage />} />
-          <Route path="/analysis/calendar" element={<AnalysisCalendarPage />} />
+          <Route path="analysis/calendar" element={<AnalysisCalendarPage />} />
         </Route>
       </Route>
 

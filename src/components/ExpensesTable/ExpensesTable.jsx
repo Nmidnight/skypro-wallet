@@ -10,7 +10,9 @@ export const ExpensesTable = ({
   transactions,
   isLoading,
   error,
+  deletingId,
   onTransactionCreated,
+  onTransactionDelete,
 }) => {
   return (
     <S.PageContainer>
@@ -41,25 +43,37 @@ export const ExpensesTable = ({
 
           {!isLoading &&
             !error &&
-            transactions.map((item) => (
-              <S.ExpenseRow key={item.id || item._id}>
-                <S.ExpenseCell>{item.description}</S.ExpenseCell>
-                <S.ExpenseCell>
-                  {categoryLabels[item.category] || item.category}
-                </S.ExpenseCell>
-                <S.ExpenseCell>{formatTransactionDate(item.date)}</S.ExpenseCell>
-                <S.ExpenseCell className="amount">
-                  {formatRubles(item.sum)}
-                </S.ExpenseCell>
-                <S.DeleteIcon>
-                  <img src="/svg/Frame_1511838850.svg" alt="Удалить" />
-                </S.DeleteIcon>
-              </S.ExpenseRow>
-            ))}
+            transactions.map((item, index) => {
+              const rowId = item.id ?? item._id;
+              const rowKey = rowId != null ? String(rowId) : `row-${index}`;
+              const isDeleting = deletingId != null && rowId === deletingId;
+              return (
+                <S.ExpenseRow key={rowKey} $muted={isDeleting}>
+                  <S.ExpenseCell>{item.description}</S.ExpenseCell>
+                  <S.ExpenseCell>
+                    {categoryLabels[item.category] || item.category}
+                  </S.ExpenseCell>
+                  <S.ExpenseCell>{formatTransactionDate(item.date)}</S.ExpenseCell>
+                  <S.ExpenseCell className="amount">
+                    {formatRubles(item.sum)}
+                  </S.ExpenseCell>
+                  <S.DeleteIcon
+                    type="button"
+                    aria-label="Удалить расход"
+                    disabled={!rowId || isDeleting}
+                    onClick={() => rowId && onTransactionDelete?.(rowId)}
+                  >
+                    <img src="/svg/Frame_1511838850.svg" alt="" />
+                  </S.DeleteIcon>
+                </S.ExpenseRow>
+              );
+            })}
         </S.ExpensesList>
       </S.ExpensesCard>
 
-      <MainPageForm onTransactionCreated={onTransactionCreated} />
+      <S.FormColumn>
+        <MainPageForm onTransactionCreated={onTransactionCreated} />
+      </S.FormColumn>
     </S.PageContainer>
   );
 };

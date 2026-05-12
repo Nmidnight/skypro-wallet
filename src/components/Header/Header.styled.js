@@ -76,17 +76,18 @@ export const MobileMenu = styled.div`
   border: 0.5px solid #999;
   border-radius: 6px;
   padding: 10px;
-  width: 138px;
-  height: 110px;
+  width: 160px;
+  min-height: 110px;
   box-shadow: 0 20px 67px -12px rgba(0, 0, 0, 0.13);
   background: #fff;
   display: flex;
   flex-direction: column;
-  align-items: start;
+  align-items: stretch;
   gap: 6px;
   position: absolute;
   top: calc(100% + 11px);
   left: -37px;
+  z-index: 20;
 `;
 
 export const MobileLink = styled.a`
@@ -103,6 +104,22 @@ export const MobileLink = styled.a`
     background-color: #f1ebfd;
     color: #7334ea;
   }
+`;
+
+export const MobileMenuButton = styled.button`
+  display: inline-block;
+  border-radius: 24px;
+  padding: 7px 13px;
+  min-height: 26px;
+  background: #f4f5f6;
+  font-weight: 400;
+  font-size: 10px;
+  text-align: center;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
 `;
 
 export const HeaderExit = styled.button`

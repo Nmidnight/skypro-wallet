@@ -6,12 +6,14 @@ import { AnalysisBtn } from "../pages/AnalysisPage";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const CalendarPageContainer = styled.div`
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   background-color: #f4f5f6;
   padding: 0 16px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 `;
 
 const TitleBack = styled.div`
@@ -91,15 +93,17 @@ export function AnalysisCalendarPage() {
           initialEndDate={today}
         />
       </CalendarContainer>
-      <AnalysisBtn
-        onClick={() =>
-          navigate("/analysis", {
-            state: { period },
-          })
-        }
-      >
-        Выбрать период
-      </AnalysisBtn>
+      <AnalysisBtnBox>
+        <AnalysisBtn
+          onClick={() =>
+            navigate("/analysis", {
+              state: { period },
+            })
+          }
+        >
+          Выбрать период
+        </AnalysisBtn>
+      </AnalysisBtnBox>
     </CalendarPageContainer>
   );
 }

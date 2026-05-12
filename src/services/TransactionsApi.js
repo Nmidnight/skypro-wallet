@@ -42,3 +42,15 @@ export async function createTransaction(token, transaction) {
         handleServerError(error);
     }
 }
+
+export async function deleteTransaction(token, transactionId) {
+    try {
+        const response = await api.delete(
+            `/transactions/${transactionId}`,
+            getAuthConfig(token),
+        );
+        return response.data;
+    } catch (error) {
+        handleServerError(error);
+    }
+}

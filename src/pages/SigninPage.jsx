@@ -5,7 +5,7 @@ import { Input } from "../components/Input/Input";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext/useAuth";
 import { signinUser } from "../services/AuthApi";
-import { notify } from "../utils/notify"; // ДОБАВИЛИ ИМПОРТ
+import { notify } from "../utils/notify";
 
 const PageWrapper = styled("div")({
   display: "flex",
@@ -17,7 +17,9 @@ const PageWrapper = styled("div")({
 });
 
 const FormContainer = styled("form")({
-  width: "360px",
+  width: "100%",
+  maxWidth: "360px",
+  boxSizing: "border-box",
   display: "flex",
   flexDirection: "column",
   gap: "12px",
@@ -36,7 +38,6 @@ const Title = styled("h1")({
   color: "#000",
 });
 
-// Добавили компонент для серверной ошибки
 const ErrorMessage = styled("p")({
   color: "#FF4D4D",
   fontSize: "12px",
@@ -72,14 +73,13 @@ const FooterText = styled("p")({
 export function SigninPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [serverError, setServerError] = useState(null); // Состояние для ошибки бэкенда
+  const [serverError, setServerError] = useState(null);
 
   const navigate = useNavigate();
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPasswordValid = password.length >= 8;
 
-  // Кнопка блокируется, если есть ошибка (ввели неверно)
   const emailError = email.length > 0 && !isEmailValid;
   const passwordError = password.length > 0 && !isPasswordValid;
   const isButtonDisabled = emailError || passwordError || !email || !password;
@@ -93,9 +93,6 @@ export function SigninPage() {
     try {
       const data = await signinUser({ login: email, password });
 
-      console.log("LOGIN RESPONSE:", data);
-      console.log("TOKEN:", data.user.token);
-      localStorage.setItem("token", data.user.token);
       authLogin(data);
 
       notify.success("Вход выполнен!");
@@ -122,7 +119,7 @@ export function SigninPage() {
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            if (serverError) setServerError(null); // Убираем ошибку при вводе
+            if (serverError) setServerError(null);
           }}
           isSuccess={isEmailValid}
           isError={emailError}
@@ -135,21 +132,20 @@ export function SigninPage() {
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            if (serverError) setServerError(null); // Убираем ошибку при вводе
+            if (serverError) setServerError(null);
           }}
           isSuccess={isPasswordValid}
           isError={passwordError}
           errorMsg="Упс! Введенные вами данные некорректны. Введите данные корректно и повторите попытку."
         />
 
-        {/* Вывод серверной ошибки над кнопкой */}
         {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
 
         <ButtonDefault
           type="submit"
           style={{ marginTop: "20px" }}
-          disabled={isButtonDisabled} // Блокирует клик
-          $disabled={isButtonDisabled} // МЕНЯЕТ ЦВЕТ НА СЕРЫЙ
+          disabled={isButtonDisabled}
+          $disabled={isButtonDisabled}
         >
           Войти
         </ButtonDefault>

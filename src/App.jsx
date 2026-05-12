@@ -9,7 +9,6 @@ function App() {
     <AuthProvider>
       <GlobalStyles />
       <AppRoutes />
-      {/* Оставляем только один контейнер в самом конце */}
       <ToastContainer 
         position="top-right"
         autoClose={5000}

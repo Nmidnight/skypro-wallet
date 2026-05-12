@@ -16,7 +16,9 @@ const PageWrapper = styled("div")({
 });
 
 const FormContainer = styled("form")({
-  width: '360px',
+  width: "100%",
+  maxWidth: "360px",
+  boxSizing: "border-box",
   display: 'flex',
   flexDirection: 'column',
   gap: '12px',
@@ -105,10 +107,6 @@ export function SignupPage() {
       notify.success("Регистрация прошла успешно!");
       navigate("/signin");
     } catch (err) {
-      // Выводим в консоль, чтобы точно видеть, что прислал бэкенд
-      console.error("Данные ошибки от сервера:", err.response?.data);
-
-      // Проверяем оба варианта ключей: 'message' или 'error'
       const errorMsg = 
         err?.response?.data?.message || 
         err?.response?.data?.error || 

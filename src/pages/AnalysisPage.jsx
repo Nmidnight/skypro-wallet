@@ -4,17 +4,21 @@ import { Calendar } from "../components/Calendar/Calendar";
 import { useEffect, useState } from "react";
 import { getTransactionsByPeriod } from "../services/Api";
 import { transformTransactions } from "../utils/transformTransactions";
+import { formatRubles } from "../utils/transactionsFormatters";
 
 import { useLocation, useNavigate } from "react-router-dom";
 
 const AnalysisPageContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
   padding: 0 120px;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 32px;
   background-color: #f4f5f6;
+  box-sizing: border-box;
+
   @media (max-width: 768px) {
     padding: 0 50px;
     gap: 24px;
@@ -48,16 +52,18 @@ export const AnalysisTitleContainer = styled.div`
 `;
 
 export const TableWrapper = styled.div`
-  height: 540px;
+  min-height: 320px;
   grid-column: span 8;
   background-color: #fff;
   box-shadow: 0 20px 67px -12px rgba(0, 0, 0, 0.13);
   border-radius: 30px;
   padding: 32px;
+  box-sizing: border-box;
+
   @media (max-width: 768px) {
     grid-column: span 12;
     border-radius: 0px;
-    padding: 0;
+    padding: 16px;
   }
 `;
 
@@ -123,8 +129,8 @@ export function AnalysisPage() {
 
         const chartData = transformTransactions(transactions);
         setData(chartData);
-      } catch (e) {
-        console.error(e);
+      } catch {
+        setData([]);
       }
     };
 
@@ -138,6 +144,9 @@ export function AnalysisPage() {
     });
   };
   const navigate = useNavigate();
+
+  const periodTotalRub = data.reduce((sum, item) => sum + (item.value || 0), 0);
+
   return (
     <AnalysisPageContainer>
       <AnalysisTitleContainer>
@@ -153,7 +162,7 @@ export function AnalysisPage() {
       </CalendarWrapper>
 
       <TableWrapper>
-        <TableTitle>9 581 ₽</TableTitle>
+        <TableTitle>{formatRubles(periodTotalRub)}</TableTitle>
         <TableText>
           Расходы за{" "}
           <span style={{ fontWeight: 600 }}>

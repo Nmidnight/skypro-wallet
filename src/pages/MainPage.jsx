@@ -2,20 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { ExpensesTable } from "../components/ExpensesTable/ExpensesTable";
 import { useAuth } from "../context/AuthContext/useAuth";
-import { getTransactions } from "../services/TransactionsApi";
+import { deleteTransaction, getTransactions } from "../services/TransactionsApi";
+import { notify } from "../utils/notify";
 
 const MainWrapper = styled.div`
-  Position: relative;
+  position: relative;
   width: 100%;
   min-height: 100vh;
-
-  `
+`;
 
 export function MainPage() {
   const { token } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
 
   const refreshTransactions = useCallback(async () => {
     if (!token) {
@@ -41,13 +42,34 @@ export function MainPage() {
     refreshTransactions();
   }, [refreshTransactions]);
 
+  const handleDeleteTransaction = useCallback(
+    async (transactionId) => {
+      if (!token || !transactionId) return;
+      if (!window.confirm("Удалить этот расход?")) return;
+
+      setDeletingId(transactionId);
+      try {
+        await deleteTransaction(token, transactionId);
+        notify.success("Расход удалён");
+        await refreshTransactions();
+      } catch (err) {
+        notify.error(err.message || "Не удалось удалить расход");
+      } finally {
+        setDeletingId(null);
+      }
+    },
+    [token, refreshTransactions],
+  );
+
   return (
     <MainWrapper>
       <ExpensesTable
         transactions={transactions}
         isLoading={isLoading}
         error={error}
+        deletingId={deletingId}
         onTransactionCreated={refreshTransactions}
+        onTransactionDelete={handleDeleteTransaction}
       />
     </MainWrapper>
   );

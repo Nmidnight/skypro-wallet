@@ -17,9 +17,10 @@ const colors = {
 };
 
 export const transformTransactions = (transactions) => {
+  const list = Array.isArray(transactions) ? transactions : [];
   const sums = {};
   let totalSum = 0;
-  transactions.forEach((t) => {
+  list.forEach((t) => {
     totalSum += t.sum;
     if (!sums[t.category]) {
       sums[t.category] = 0;

@@ -157,7 +157,7 @@ export function MainPageForm({ onTransactionCreated }) {
   };
 
   return (
-    <MainFormcontainer onSubmit={handleSubmit}>
+    <MainFormcontainer id="new-expense" onSubmit={handleSubmit}>
       <MainFormTitle>Новый расход</MainFormTitle>
       <ContentContainer>
         <ContentLabel>
